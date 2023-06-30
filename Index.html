@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Formulario con campo de firma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.0/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+  <style>
+    #canvasContainer {
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    #canvas {
+      border: 2px solid #000;
+      border-radius: 8px;
+      cursor: crosshair;
+    }
+
+    #borrar {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Formulario con campo de firma</h1>
+
+    <form>
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" class="form-control" id="nombre" required>
+      </div>
+
+      <div id="canvasContainer">
+        <label for="firma">Firma:</label><br>
+        <canvas id="canvas" width="400" height="200"></canvas>
+        <button type="button" class="btn btn-danger" id="borrar">Borrar firma</button>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="guardar">Guardar en PDF</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+      var drawing = false;
+
+      canvas.addEventListener('mousedown', startDrawing);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseout', stopDrawing);
+
+      var borrarButton = document.getElementById('borrar');
+      borrarButton.addEventListener('click', borrarFirma);
+
+      var guardarButton = document.getElementById('guardar');
+      guardarButton.addEventListener('click', guardarEnPDF);
+
+      function startDrawing(e) {
+        drawing = true;
+        draw(e);
+      }
+
+      function draw(e) {
+        if (!drawing) return;
+
+        var rect = canvas.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+
+        context.lineWidth = 2;
+        context.lineCap = 'round';
+        context.strokeStyle = '#000';
+
+        context.lineTo(x, y);
+        context.stroke();
+        context.beginPath();
+        context.moveTo(x, y);
+      }
+
+      function stopDrawing() {
+        drawing = false;
+        context.beginPath();
+      }
+
+      function borrarFirma() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function guardarEnPDF() {
+        html2pdf().set({
+          margin: [10, 10, 10, 10],
+          filename: 'formulario.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(document.body).save();
+      }
+    });
+  </script>
+</body>
+</html>
