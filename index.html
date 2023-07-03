@@ -1,108 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Formulario con campo de firma</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.0/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
-  <style>
-    #canvasContainer {
-      border: 1px solid #ccc;
-      padding: 10px;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-    }
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <style>
+        .signature-pad {
+            border: 1px solid #ccc;
+        }
 
-    #canvas {
-      border: 2px solid #000;
-      border-radius: 8px;
-      cursor: crosshair;
-    }
-
-    #borrar {
-      margin-top: 10px;
-    }
-  </style>
+        .signature-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Formulario con campo de firma</h1>
+    <div class="container mt-4">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label for="campo1">Campo 1:</label>
+            </div>
+            <div class="col-md-3">
+                <label for="campo2">Campo 2:</label>
+            </div>
+            <div class="col-md-3">
+                <label for="campo3">Campo 3:</label>
+            </div>
+            <div class="col-md-3">
+                <label for="periodo">Periodo:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control date-input" id="periodo-from" placeholder="Desde">
+                    <div class="input-group-prepend input-group-append">
+                        <span class="input-group-text">a</span>
+                    </div>
+                    <input type="text" class="form-control date-input" id="periodo-to" placeholder="Hasta">
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered" id="editableTable">
+            <thead>
+                <tr>
+                    <th>Columna 1</th>
+                    <th>Columna 2</th>
+                    <th>Columna 3</th>
+                    <th>Columna 4</th>
+                    <th>Columna 5</th>
+                    <th>Columna 6</th>
+                    <th>Columna 7</th>
+                    <th>Columna 8</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true"></td>
+                    <td><input class="date-input form-control" type="text"></td>
+                    <td><input class="date-input form-control" type="text"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td><button class="btn btn-danger btn-delete">Eliminar</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-success" id="addRowBtn">Agregar Fila</button>
+    </div>
 
-    <form>
-      <div class="form-group">
-        <label for="nombre">Nombre:</label>
-        <input type="text" class="form-control" id="nombre" required>
-      </div>
+    <div class="container mt-4" id="signatureSection">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="signature-container">
+                    <canvas class="signature-pad" width="200" height="100"></canvas>
+                    <button class="btn btn-danger btn-delete-signature">Borrar firma</button>
+                </div>
+                <div>
+                    <label for="department1">Departamento 1:</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="signature-container">
+                    <canvas class="signature-pad" width="200" height="100"></canvas>
+                    <button class="btn btn-danger btn-delete-signature">Borrar firma</button>
+                </div>
+                <div>
+                    <label for="department2">Departamento 2:</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="signature-container">
+                    <canvas class="signature-pad" width="200" height="100"></canvas>
+                    <button class="btn btn-danger btn-delete-signature">Borrar firma</button>
+                </div>
+                <div>
+                    <label for="department3">Departamento 3:</label>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      <div id="canvasContainer">
-        <label for="firma">Firma:</label><br>
-        <canvas id="canvas" width="400" height="200"></canvas>
-        <button type="button" class="btn btn-danger" id="borrar">Borrar firma</button>
-      </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Inicializar el componente datepicker en los campos de fecha
+            $('.date-input').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true
+            }).on('changeDate', function (e) {
+                // Guardar la fecha seleccionada en el campo correspondiente
+                $(this).val(e.format());
+            });
 
-      <button type="button" class="btn btn-primary" id="guardar">Guardar en PDF</button>
-    </form>
-  </div>
+            // Botón de eliminar fila
+            $('#editableTable').on('click', '.btn-delete', function () {
+                $(this).closest('tr').remove();
+            });
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var canvas = document.getElementById('canvas');
-      var context = canvas.getContext('2d');
-      var drawing = false;
+            // Botón de agregar fila
+            $('#addRowBtn').click(function () {
+                var newRow = '<tr>' +
+                    '<td contenteditable="true"></td>' +
+                    '<td><input class="date-input form-control" type="text"></td>' +
+                    '<td><input class="date-input form-control" type="text"></td>' +
+                    '<td contenteditable="true"></td>' +
+                    '<td contenteditable="true"></td>' +
+                    '<td contenteditable="true"></td>' +
+                    '<td contenteditable="true"></td>' +
+                    '<td contenteditable="true"></td>' +
+                    '<td><button class="btn btn-danger btn-delete">Eliminar</button></td>' +
+                    '</tr>';
+                $('#editableTable tbody').append(newRow);
+                // Inicializar el componente datepicker en los campos de fecha de la nueva fila
+                $('.date-input').datepicker({
+                    format: 'dd/mm/yyyy',
+                    autoclose: true
+                }).on('changeDate', function (e) {
+                    $(this).val(e.format());
+                });
+            });
 
-      canvas.addEventListener('mousedown', startDrawing);
-      canvas.addEventListener('mousemove', draw);
-      canvas.addEventListener('mouseup', stopDrawing);
-      canvas.addEventListener('mouseout', stopDrawing);
+            // Botón de borrar firma
+            $('#signatureSection').on('click', '.btn-delete-signature', function () {
+                var signatureContainer = $(this).closest('.signature-container');
+                var signaturePad = signatureContainer.find('.signature-pad')[0];
+                var ctx = signaturePad.getContext('2d');
+                ctx.clearRect(0, 0, signaturePad.width, signaturePad.height);
+            });
 
-      var borrarButton = document.getElementById('borrar');
-      borrarButton.addEventListener('click', borrarFirma);
-
-      var guardarButton = document.getElementById('guardar');
-      guardarButton.addEventListener('click', guardarEnPDF);
-
-      function startDrawing(e) {
-        drawing = true;
-        draw(e);
-      }
-
-      function draw(e) {
-        if (!drawing) return;
-
-        var rect = canvas.getBoundingClientRect();
-        var x = e.clientX - rect.left;
-        var y = e.clientY - rect.top;
-
-        context.lineWidth = 2;
-        context.lineCap = 'round';
-        context.strokeStyle = '#000';
-
-        context.lineTo(x, y);
-        context.stroke();
-        context.beginPath();
-        context.moveTo(x, y);
-      }
-
-      function stopDrawing() {
-        drawing = false;
-        context.beginPath();
-      }
-
-      function borrarFirma() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-      }
-
-      function guardarEnPDF() {
-        html2pdf().set({
-          margin: [10, 10, 10, 10],
-          filename: 'formulario.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(document.body).save();
-      }
-    });
-  </script>
+            // Inicializar los campos de firma
+            var signaturePads = $('.signature-pad');
+            signaturePads.each(function () {
+                var canvas = $(this)[0];
+                var signaturePad = new SignaturePad(canvas);
+            });
+        });
+    </script>
 </body>
 </html>
