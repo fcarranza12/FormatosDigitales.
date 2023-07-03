@@ -14,19 +14,41 @@
             align-items: center;
             margin-top: 10px;
         }
+
+
+          .department-label {
+            margin-left: 10px; /* Ajusta el valor según tu preferencia */
+        }
     </style>
 </head>
 <body>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Título de la página</h1>
+            </div>
+            <div class="col-md-6 text-right">
+                <img src="ruta-del-logo.png" alt="Logo" width="100">
+            </div>
+        </div>
+    </div>
+
+
+
     <div class="container mt-4">
         <div class="row mb-3">
             <div class="col-md-3">
                 <label for="campo1">Campo 1:</label>
+                <input type="text" class="form-control" id="campo1-textbox">
             </div>
             <div class="col-md-3">
                 <label for="campo2">Campo 2:</label>
+                <input type="text" class="form-control" id="campo2-textbox">
             </div>
             <div class="col-md-3">
                 <label for="campo3">Campo 3:</label>
+                <input type="text" class="form-control" id="campo3-textbox">
             </div>
             <div class="col-md-3">
                 <label for="periodo">Periodo:</label>
@@ -78,7 +100,7 @@
                     <button class="btn btn-danger btn-delete-signature">Borrar firma</button>
                 </div>
                 <div>
-                    <label for="department1">Departamento 1:</label>
+                    <label class="department-label" for="department1">Departamento 1</label>
                 </div>
             </div>
             <div class="col-md-4">
@@ -87,7 +109,7 @@
                     <button class="btn btn-danger btn-delete-signature">Borrar firma</button>
                 </div>
                 <div>
-                    <label for="department2">Departamento 2:</label>
+                    <label for="department2">Departamento 2</label>
                 </div>
             </div>
             <div class="col-md-4">
@@ -96,7 +118,7 @@
                     <button class="btn btn-danger btn-delete-signature">Borrar firma</button>
                 </div>
                 <div>
-                    <label for="department3">Departamento 3:</label>
+                    <label for="department3">Departamento 3</label>
                 </div>
             </div>
         </div>
@@ -116,6 +138,25 @@
                 // Guardar la fecha seleccionada en el campo correspondiente
                 $(this).val(e.format());
             });
+
+            // Obtener el valor del campo de texto junto a "Campo 1" al hacer clic en un botón
+            $('#myButton').click(function () {
+                var campo1Value = $('#campo1-textbox').val();
+                console.log('Valor de Campo 1:', campo1Value);
+            });
+
+            // Obtener el valor del campo de texto junto a "Campo 2" al hacer clic en un botón
+            $('#myButton').click(function () {
+                var campo2Value = $('#campo2-textbox').val();
+                console.log('Valor de Campo 2:', campo1Value);
+            });
+            // Obtener el valor del campo de texto junto a "Campo 3" al hacer clic en un botón
+            $('#myButton').click(function () {
+                var campo3Value = $('#campo3-textbox').val();
+                console.log('Valor de Campo 3:', campo1Value);
+            });
+
+
 
             // Botón de eliminar fila
             $('#editableTable').on('click', '.btn-delete', function () {
